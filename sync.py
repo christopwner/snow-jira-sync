@@ -6,16 +6,22 @@ logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-# setup url for snow tenant (url) and user from env
-url = 'https://' + os.environ['SNOW_URL'] + '.service-now.com/api/now/table/incident?active=true&assigned_to=' + os.environ['SNOW_USER']
+# setup url for all incidents assigned to SNOW_USER
+url = 'https://' + os.environ['SNOW_NAME'] + '.service-now.com/api/now/table/incident?active=true&assigned_to=' + os.environ['SNOW_USER']
 
-# setup json header and make request using auth from env
+# get all incidents
 headers = {"Accept":"application/json"}
-response = requests.post(url, auth=(os.environ['SNOW_USER'],os.environ['SNOW_PASS']), headers=headers, verify=True)
+response = requests.get(url, auth=(os.environ['SNOW_USER'],os.environ['SNOW_PASS']), headers=headers, verify=True)
 
-# log err and exit if not 201
-if response.status_code != 201:
-    logger.fatal("Didn't receive 200 response code")
+# log err and exit if not ok
+if response.status_code != 200:
+    logger.fatal("Unable to get incidents from SNow")
     exit(1)
 
-logger.info(response.text)
+# read-in each incident
+results = json.loads(response.text)['result']
+for incident in results:
+    sys_id = incident['sys_id']
+    title = incident['short_description']
+    summary = incident['description']
+    print(sys_id, title, summary)
