@@ -6,7 +6,7 @@ logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-#headers = {"Accept":"application/json", "Content-Type":"application/json"}
+headers = {"Accept":"application/json", "Content-Type":"application/json"}
 
 # setup url for all incidents assigned to SNOW_USER
 url = 'https://' + os.environ['SNOW_NAME'] + '.service-now.com/api/now/table/incident?assigned_to=' \
@@ -42,8 +42,7 @@ customfield = os.environ['JIRA_FIELD']
 snowissues = {}
 logger.debug('found %i issue(s)', len(issues))
 for issue in issues:
-    snowissues['021fa4070f8533c01cfedb0be1050e37'] = issue
-    #snowissues[issue['fields'][customfield]] = issue
+    snowissues[issue['fields'][customfield]] = issue
 
 # read-in each incident
 logger.debug('found %i incident(s)', len(incidents))
